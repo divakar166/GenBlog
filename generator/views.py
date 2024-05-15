@@ -2,6 +2,10 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
 from .models import CustomUser
+import os
+import google.generativeai as genai
+from django.http import HttpResponse
+import json 
 
 def index(request):
     return render(request, 'index.html')
@@ -32,7 +36,6 @@ def user_login(request):
             return render(request, 'login.html', {'error_message': error_message})
     return render(request, 'login.html')
 
-
 def register(request):
     if request.method == 'POST':
         name = request.POST.get("name")
@@ -54,3 +57,24 @@ def register(request):
 def user_logout(request):
     logout(request)
     return redirect('index')
+
+def gemini_view(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        topic = data.get('topic', None)
+        
+        if topic:
+            genai.configure(api_key=os.environ.get("GEMINI_API_KEY"))
+            model = genai.GenerativeModel('gemini-pro')
+            
+            try:
+                response = model.generate_content(f"Write a blog on topic: {topic}")
+                print(response.text)
+                return HttpResponse(json.dumps({'content': response.text}), content_type="application/json")
+            except Exception as e:
+                print(e)
+                return HttpResponse(json.dumps({'error': str(e)}), status=500, content_type="application/json")  # Return error message with status code 500
+        else:
+            return HttpResponse(json.dumps({'error': 'Topic is missing'}), status=400, content_type="application/json")  # Return error message with status code 400
+    else:
+        return HttpResponse(json.dumps({'error': 'Method not allowed'}), status=405, content_type="application/json")

@@ -6,5 +6,6 @@ urlpatterns = [
     path('generate',generate,name='generate'),
     path('login',user_login , name='login'),
     path('register',register , name='register'),
-    path('logout', user_logout, name='logout')
+    path('logout', user_logout, name='logout'),
+    path('gemini', gemini_view, name='gemini'),
 ]

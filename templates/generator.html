@@ -61,8 +61,12 @@
     <nav class="p-4 text-white flex justify-between">
         <div class="flex justify-center items-center">
           <a href="/">
-            <img src="/media/images/logo.png" class="w-[200px] h-[50px] ">
+            <img src="/media/images/logo.png" class=" h-[30px] ">
           </a>
+        </div>
+        <div class="flex justify-center items-center text-black">
+          <a href="#" class="py-1 px-2 text-sm uppercase font-bold border-slate-500 hover:text-blue-500">Browse</a>
+          <a href="#" class="py-1 px-2 text-sm font-bold uppercase hover:text-blue-700">About</a>
         </div>
         <div class="flex justify-between items-center">
           {% if user.is_authenticated %}
@@ -82,9 +86,10 @@
     <div class="flex-grow container mx-auto mt-16 px-4 sm:px-0">
         <div class="max-w-3xl mx-auto flex flex-col">
             <div>
-                <h2 class="text-xl mb-4 font-semibold">Enter Youtube Video Link</h2>
+                <h2 class="text-xl mb-4 font-semibold">Enter Topic</h2>
+                {% csrf_token %}
                 <div class="flex space-x-4">
-                    <input id="youtubeLink" type="url" placeholder="Paste Youtube Link..." class="flex-grow p-2 border border-blue-400 rounded-l-md">
+                    <input id="topic" type="text" placeholder="Topic: Integrating AI" class="flex-grow p-2 border border-blue-400 rounded-l-md">
                     <button id="generateBlogButton" class="bg-blue-600 text-white px-4 py-2 rounded-r-md hover:bg-blue-700 transition-colors">Generate</button>
                 </div>
             </div>
@@ -99,21 +104,22 @@
         </div>
     </div>
 
-    <script>
+    <!-- <script>
         document.getElementById('generateBlogButton').addEventListener('click', async () => {
-            const youtubeLink = document.getElementById('youtubeLink').value;
+            const topic = document.getElementById('topic').value;
             const blogContent = document.getElementById('blogContent');
-            if(youtubeLink) {
+            if(topic) {
                 document.getElementById('loading-circle').style.display = 'block';
                 blogContent.innerHTML = '';
-                const endpointUrl = '/generate-blog';
+                const endpointUrl = '/gemini';
+                // let csrf = {""}
                 try {
                     const response = await fetch(endpointUrl, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
                         },
-                        body: JSON.stringify({ link: youtubeLink })
+                        body: JSON.stringify({ topic: topic })
                     });
                     const data = await response.json();
                     blogContent.innerHTML = data.content;
@@ -126,6 +132,54 @@
                 document.getElementById('loading-circle').style.display = 'none';
             } else {
                 alert("Please enter a YouTube link.");
+            }
+        });
+    </script> -->
+    <script src="https://cdn.jsdelivr.net/npm/showdown"></script>
+    <script>
+        document.getElementById('generateBlogButton').addEventListener('click', async () => {
+            const topic = document.getElementById('topic').value;
+            const blogContent = document.getElementById('blogContent');
+            if (topic) {
+                document.getElementById('loading-circle').style.display = 'block';
+                blogContent.innerHTML = '';
+                const endpointUrl = '/gemini';
+                const csrfToken = document.querySelector('input[name="csrfmiddlewaretoken"]').value;
+    
+                try {
+                    const response = await fetch(endpointUrl, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': csrfToken
+                        },
+                        body: JSON.stringify({ topic: topic })
+                    });
+                    const data = await response.json();
+                    blogContent.innerHTML = '';
+                    const lines  = data.content.split('\n');
+                    const converter = new showdown.Converter();
+                    const contentDiv = document.createElement('div');
+                    lines.forEach(line => {
+                        // Convert markdown syntax to HTML
+                        const html = converter.makeHtml(line.trim());
+                        // Create a div element to contain the converted HTML
+                        const lineDiv = document.createElement('div');
+                        // Set the innerHTML of the div to the converted HTML
+                        lineDiv.innerHTML = html;
+                        // Append the div to the content div
+                        contentDiv.appendChild(lineDiv);
+                    });
+                    blogContent.appendChild(contentDiv);
+                    const block = document.getElementsByClassName('generated_blog_block')[0];
+                    block.style.display = 'block';
+                } catch (error) {
+                    console.error("Error occurred:", error);
+                    alert("Blog Created");
+                }
+                document.getElementById('loading-circle').style.display = 'none';
+            } else {
+                alert("Please enter a topic.");
             }
         });
     </script>
