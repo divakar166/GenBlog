@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Blog Generator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Nosifer&display=swap');
+      body{
+        font-family: 'Inter';
+      }
+      .logo{
+        font-family: 'Nosifer';
+      }
+    </style>
+    <style>
+        @keyframes rotate {
+            from {
+                transform: rotate(0deg);
+            }
+            to { 
+                transform: rotate(360deg);
+            }
+        }
+         
+        
+         @-webkit-keyframes rotate {
+            from {
+                -webkit-transform: rotate(0deg);
+            }
+            to { 
+                -webkit-transform: rotate(360deg);
+            }
+        }
+        
+        .load {
+            width: 100px;
+            height: 100px;
+            margin: 110px auto 0;
+            border:solid 10px #8822aa;
+            border-radius: 50%;
+            border-right-color: transparent;
+            border-bottom-color: transparent;
+             -webkit-transition: all 0.5s ease-in;
+            -webkit-animation-name:             rotate; 
+            -webkit-animation-duration:         1.0s; 
+            -webkit-animation-iteration-count:  infinite;
+            -webkit-animation-timing-function: linear;
+                
+                 transition: all 0.5s ease-in;
+            animation-name:             rotate; 
+            animation-duration:         1.0s; 
+            animation-iteration-count:  infinite;
+            animation-timing-function: linear; 
+        }
+    </style>
+</head>
+<body class="flex flex-col min-h-scrren overflow-hidden bg-gray-100 font-sans antialised">
+    <!-- Navbar -->
+    <nav class="p-4 text-white flex justify-between">
+        <div class="flex justify-center items-center">
+          <a href="/">
+            <img src="/media/images/logo.png" class=" h-[30px] ">
+          </a>
+        </div>
+        <div class="flex justify-center items-center text-black">
+          <a href="#" class="py-1 px-2 text-sm uppercase font-bold border-slate-500 hover:text-blue-500">Browse</a>
+          <a href="#" class="py-1 px-2 text-sm font-bold uppercase hover:text-blue-700">About</a>
+        </div>
+        <div class="flex justify-between items-center">
+          {% if user.is_authenticated %}
+          <a href="#" class="text-black mx-4">Welcome <span class="text-blue-500">{{ user.name }}</span></a>
+          <a href="/blog-list" class="text-black hover:underline mx-4">Saved Blog Posts</a>
+          <a href="/logout" class="text-black hover:text-blue-500 mx-4">Logout</a>
+          {% else %}
+          <div class="text-black">
+            <a href="login" class="py-1 px-2 text-sm uppercase font-bold border-slate-500 hover:text-blue-500">Login</a>
+            <a href="register" class="py-1 px-2 text-sm font-bold uppercase hover:text-blue-700">Get started</a>
+          </div>
+          {% endif %}
+        </div>
+      </nav>
+    <!-- Main -->
+    <div class="flex-grow container mt-5 mx-auto px-4 sm:px-0">
+        <div class="max-w-3xl mx-auto flex flex-col">
+
+            <!-- Introduction section -->
+            <div class="text-center">
+                <h2 class="text-4xl pb-5 font-extrabold text-transparent bg-clip-text bg-gradient-to-br from-pink-500 via-blue-500 to-red-600">Welcome to the AI Blog Generator</h2>
+                <p class="text-slate-500 text-sm italic">
+                  Generate high-quality blog articles from YouTube videos using artificial intelligence.
+                  Simply enter the link to the YouTube video below and let the AI create the content for you!
+                </p>
+            </div>
+            <br>
+            <div class="flex justify-center items-center p-2">
+                <img src="/media/images/1.jpg" class="w-64 h-64 rounded m-2 transition ease-in-out delay-150 shadow-lg hover:-translate-y-1 hover:scale-110 duration-300" alt="">
+                <img src="/media/images/2.jpg" class="w-64 h-64 rounded m-2 transition ease-in-out delay-150 shadow-lg hover:-translate-y-1 hover:scale-110 duration-300" alt="">
+                <img src="/media/images/3.jpg" class="w-64 h-64 rounded m-2 transition ease-in-out delay-150 shadow-lg hover:-translate-y-1 hover:scale-110 duration-300" alt="">
+            </div>
+            <div class="flex justify-center h-16 items-center">
+              <!-- <a href="/generate" class="px-4 py-2 bg-blue-500 hover:text-white hover:scale-105 transition  rounded">Generate Blog</a> -->
+              <a href="generate" class="text-lg hover:border-2 hover:rounded-xl hover:cursor-pointer hover:border-blue-500 px-2 font-extrabold text-transparent bg-clip-text bg-gradient-to-br from-pink-500 via-blue-500 to-red-600">Generate Blog</a>
+            </div>
+        </div>
+    </div>
+
+
+    <footer class="text-center p-4 text-blacl mt-2">
+        Created by <span class="text-lg pb-5 font-extrabold text-transparent bg-clip-text bg-gradient-to-br from-pink-500 via-blue-500 to-red-600">Tech Paradise</span>
+    </footer>
+
+</body>
+</html>
