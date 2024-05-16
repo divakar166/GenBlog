@@ -14,7 +14,8 @@ class BlogPost(models.Model):
     author = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     last_updated = models.DateTimeField(auto_now=True)
-    is_public = models.BooleanField(default=False)
+    is_public = models.BooleanField(default=True)
+    is_published = models.BooleanField(default=False)
 
     def __str__(self):
         return self.title
