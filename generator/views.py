@@ -1,6 +1,6 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import authenticate, login, logout, get_user_model
 from .models import CustomUser, BlogPost
 import os
 import google.generativeai as genai
@@ -8,7 +8,18 @@ from django.http import HttpResponse
 import json 
 
 def index(request):
-    return render(request, 'index.html')
+    if request.user.is_authenticated:
+        blogs = BlogPost.objects.filter(is_published=True).exclude(author=request.user).order_by('-created_at')[:3]
+    else:
+        blogs = BlogPost.objects.filter(is_published=True).order_by('-created_at')[:3]
+    return render(request, 'index.html', context={'blogs': blogs})
+
+def explore(request):
+    if request.user.is_authenticated:
+        blogs = BlogPost.objects.filter(is_published=True).exclude(author=request.user).order_by('-created_at')
+    else:
+        blogs = BlogPost.objects.filter(is_published=True).order_by('-created_at')
+    return render(request, 'explore.html', context={'blogs': blogs})
 
 @login_required
 def generate(request):
@@ -69,7 +80,7 @@ def gemini_view(request):
                 response = model.generate_content(f"Write an attractive blog on the topic: {topic}.")
                 user = CustomUser.objects.get(username=request.user)
                 blogPost = BlogPost.objects.create(
-                    title=f"Blog on {topic}",
+                    title=f"{topic}",
                     content=response.text,
                     author=user
                 )
@@ -108,3 +119,6 @@ def blog_submit(request):
                 return HttpResponse(json.dumps({'error': e}), content_type="application/json")
         return HttpResponse(json.dumps({'error': 'Method not allowed'}), content_type="application/json")
         
+def blog_detail(request, slug):
+    blog = get_object_or_404(BlogPost, slug=slug)
+    return render(request, 'blog_detail.html', {'blog': blog})

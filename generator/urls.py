@@ -8,5 +8,7 @@ urlpatterns = [
     path('register',register , name='register'),
     path('logout', user_logout, name='logout'),
     path('gemini', gemini_view, name='gemini'),
-    path('blog_submit', blog_submit, name='blog_submit')
+    path('blog_submit', blog_submit, name='blog_submit'),
+    path('explore', explore, name='explore'),
+    path('blog/<slug:slug>', blog_detail, name='blog_detail')
 ]
