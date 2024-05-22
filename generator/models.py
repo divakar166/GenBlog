@@ -18,6 +18,7 @@ class BlogPost(models.Model):
     last_updated = models.DateTimeField(auto_now=True)
     is_public = models.BooleanField(default=True)
     is_published = models.BooleanField(default=False)
+    thumbnail = models.URLField(max_length=1000,blank=True, null=True)
 
     def save(self, *args, **kwargs):
         if not self.slug:

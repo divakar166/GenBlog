@@ -39,7 +39,7 @@
         <div class="max-w-3xl mx-auto bg-white p-6 rounded shadow-md">
             <h1 class="text-3xl font-bold mb-4">{{ blog.title }}</h1>
             <p class="text-gray-700">{{ blog.content }}</p>
-            <p class="text-gray-500 text-sm mt-4">Author: {{ blog.author }}</p>
+            <p class="text-gray-500 text-sm mt-4">Author: {{ blog.author.name }}</p>
             <p class="text-gray-500 text-sm">Published on: {{ blog.created_at }}</p>
         </div>
     </div>

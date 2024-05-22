@@ -104,6 +104,7 @@ def blog_submit(request):
                 blog = BlogPost.objects.get(id=blogID)
                 blog.is_published = True
                 blog.is_public = bool(visibility)
+
                 blog.save()
                 return HttpResponse(json.dumps({'content':"success"}), content_type="application/json")
             except Exception as e:
@@ -122,3 +123,10 @@ def blog_submit(request):
 def blog_detail(request, slug):
     blog = get_object_or_404(BlogPost, slug=slug)
     return render(request, 'blog_detail.html', {'blog': blog})
+
+def user_blogs(request):
+    blogs = BlogPost.objects.filter(author=request.user)
+    return render(request, 'user_blogs.html', {'blogs':blogs})
+
+def profile(request):
+    return render(request, 'profile.html')
