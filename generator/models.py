@@ -18,7 +18,8 @@ class BlogPost(models.Model):
     last_updated = models.DateTimeField(auto_now=True)
     is_public = models.BooleanField(default=True)
     is_published = models.BooleanField(default=False)
-    thumbnail = models.URLField(max_length=1000,blank=True, null=True)
+    thumbnail = models.ImageField(upload_to='thumbnails/', blank=True, null=True)
+    likes = models.PositiveIntegerField(default=0)
 
     def save(self, *args, **kwargs):
         if not self.slug:
@@ -30,3 +31,10 @@ class BlogPost(models.Model):
 
     class Meta:
         ordering = ['-created_at']
+
+class Like(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    post = models.ForeignKey(BlogPost, on_delete=models.CASCADE)
+
+    class Meta:
+        unique_together = ('user', 'post')
