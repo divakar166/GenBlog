@@ -8,6 +8,7 @@ from django.http import HttpResponse, JsonResponse
 import json
 from youtube_transcript_api import YouTubeTranscriptApi
 import re
+from pytube import YouTube
 
 def index(request):
     if request.user.is_authenticated:
@@ -165,32 +166,29 @@ def yt_view(request):
         yt_link = data.get('yt_link', None)
         if yt_link:
             video_id = get_youtube_video_id(yt_link)
+            title = YouTube(yt_link).title
+            print(title)
             if video_id:
-                extraction = YouTubeTranscriptApi.get_transcript('vyQv563Y-fk')
+                extraction = YouTubeTranscriptApi.get_transcript(video_id)
                 final_text = ""
                 for item in extraction:
                     final_text += item['text']
-                genai.configure(api_key=os.environ.get("GEMINI_API_KEY"))
-                model = genai.GenerativeModel('gemini-pro')
                 try:
-                    response = model.generate_content(f"Based on the following transcript from a YouTube video, write a comprehensive blog article, write it based on the transcript, but dont make it look like a youtube video, make it look like a proper blog article:\n\n{final_text}")
-                    text = response.text()
-                    lines = text.splitlines()
-                    if not lines:
-                        first_line = 'Unknown'
-                    else:
-                        first_line = lines[0].strip()
-                    user = CustomUser.objects.get(username=request.user)
+                    genai.configure(api_key=os.environ.get("GEMINI_API_KEY"))
+                    model = genai.GenerativeModel('gemini-pro')
+                    response = model.generate_content(f"Based on the following transcript from a YouTube video, write a comprehensive blog article, write it based on the transcript, but dont make it look like a youtube video, make it look like a proper blog article: {final_text}")
+                    response_data = response.candidates[0].content.parts[0].text
+                    user = CustomUser.objects.get(username=request.user.username)
                     blogPost = BlogPost.objects.create(
-                        title=f"{first_line}",
-                        content=response.text,
+                        title=title,
+                        content=response_data,
                         author=user
                     )
-                    return HttpResponse(json.dumps({'content': response.text,'blogpost_id':blogPost.id}), content_type="application/json")
+                    return HttpResponse(json.dumps({'content': response_data, 'blogpost_id': blogPost.id}), content_type="application/json")
                 except Exception as e:
                     print(e)
                     return HttpResponse(json.dumps({'error': str(e)}), status=500, content_type="application/json")
             else:
-                return HttpResponse(json.dumps({'error': "Error in youtube link"}), status=400, content_type="application/json")
+                return HttpResponse(json.dumps({'error': "Error in YouTube link"}), status=400, content_type="application/json")
     else:
         return HttpResponse(json.dumps({'error': 'Method not allowed'}), status=400, content_type="application/json")

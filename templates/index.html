@@ -60,8 +60,12 @@
         <div class="grid grid-cols-3 gap-4 w-[90%]">
           {% for blog in blogs %}
             <div class="max-w-sm rounded overflow-hidden shadow-lg">
-              <div class="h-48 overflow-hidden">
-                <img class="object-cover h-full w-full" src="/media/images/blog.jpg" alt="Card image cap">
+              <div class="h-auto w-auto overflow-hidden">
+                {% if blog.thumbnail %}
+                  <img src="{{ blog.thumbnail.url }}" alt="Thumbnail for {{ blog.title }}">
+                {% else %}
+                  <img class="object-cover h-full w-full" src="/media/images/blog.jpg" alt="Card image cap">
+                {% endif %}
               </div>
               <div class="px-6 py-4">
                 <a href="{% url 'blog_detail' blog.slug %}" class="text-2xl font-semibold mb-2 hover:text-blue-500">{{ blog.title }}</a>

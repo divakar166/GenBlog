@@ -260,7 +260,7 @@
             let action = 'submit';
             let visibility = $('#visibility').val();
             const endpointUrl = '/blog_submit';
-            const csrfToken = $('input[name="csrfmiddlewaretoken"]').val();
+            const csrfToken = '{{ csrf_token }}'
             const response = await fetch(endpointUrl, {
                 method: 'POST',
                 headers: {
@@ -271,7 +271,7 @@
             });
             const data = await response.json();
             if (data.content == 'success'){
-                window.location.href = '/'
+                window.location.href = '/blogs'
             }else{
                 alert(data.error)
             }
@@ -283,7 +283,7 @@
             let action = 'cancel';
             let visibility = $('#visibility').val();
             const endpointUrl = '/blog_submit';
-            const csrfToken = $('input[name="csrfmiddlewaretoken"]').val();
+            const csrfToken = '{{ csrf_token }}'
             const response = await fetch(endpointUrl, {
                 method: 'POST',
                 headers: {
