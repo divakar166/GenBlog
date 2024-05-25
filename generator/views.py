@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth import authenticate, login, logout, get_user_model
 from .models import CustomUser, BlogPost, Like
 import os
@@ -9,6 +10,8 @@ import json
 from youtube_transcript_api import YouTubeTranscriptApi
 import re
 from pytube import YouTube
+from django.core.files.storage import default_storage
+from django.core.files.base import ContentFile
 
 def index(request):
     if request.user.is_authenticated:
@@ -90,9 +93,9 @@ def topic_view(request):
                 return HttpResponse(json.dumps({'content': response.text,'blogpost_id':blogPost.id}), content_type="application/json")
             except Exception as e:
                 print(e)
-                return HttpResponse(json.dumps({'error': str(e)}), status=500, content_type="application/json")  # Return error message with status code 500
+                return HttpResponse(json.dumps({'error': str(e)}), status=500, content_type="application/json")
         else:
-            return HttpResponse(json.dumps({'error': 'Topic is missing'}), status=400, content_type="application/json")  # Return error message with status code 400
+            return HttpResponse(json.dumps({'error': 'Topic is missing'}), status=400, content_type="application/json")
     else:
         return HttpResponse(json.dumps({'error': 'Method not allowed'}), status=405, content_type="application/json")
 
@@ -134,9 +137,41 @@ def user_blogs(request):
     blogs = BlogPost.objects.filter(author=request.user)
     return render(request, 'user_blogs.html', {'blogs':blogs})
 
+@login_required
 def profile(request):
-    return render(request, 'profile.html')
+    if request.method == 'POST':
+        user = request.user
+        user.name = request.POST.get('name')
 
+        if 'profile_img' in request.FILES:
+            user.profile_img.save(request.FILES['profile_img'].name, ContentFile(request.FILES['profile_img'].read()))
+        
+        user.save()
+        return redirect('profile')
+
+    return render(request, 'profile.html', {'user': request.user})
+
+@login_required
+@csrf_exempt
+def profile_update(request):
+    if request.method == 'POST':
+        user = request.user
+        user.name = request.POST.get('name')
+        
+        if 'profile_img' in request.FILES:
+            user.profile_img.save(request.FILES['profile_img'].name, request.FILES['profile_img'])
+        
+        user.save()
+
+        response_data = {
+            'name': user.name,
+            'profile_img_url': user.profile_img.url if user.profile_img else None
+        }
+        
+        return JsonResponse(response_data)
+
+    return JsonResponse({'error': 'Invalid request'}, status=400)
+    
 def like_blog_post(request, post_id):
     if request.method == "POST":
         post = get_object_or_404(BlogPost, id=post_id)
@@ -159,7 +194,6 @@ def get_youtube_video_id(url):
   else:
     return None
 
-
 def yt_view(request):
     if request.method == 'POST':
         data = json.loads(request.body)
@@ -176,7 +210,7 @@ def yt_view(request):
                 try:
                     genai.configure(api_key=os.environ.get("GEMINI_API_KEY"))
                     model = genai.GenerativeModel('gemini-pro')
-                    response = model.generate_content(f"Based on the following transcript from a YouTube video, write a comprehensive blog article, write it based on the transcript, but dont make it look like a youtube video, make it look like a proper blog article: {final_text}")
+                    response = model.generate_content(f"Based on the following transcript from a YouTube video,write a comprehensive blog article, write it based on the transcript, but dont make it look like a youtube video, make it look like a proper blog article:{final_text}")
                     response_data = response.candidates[0].content.parts[0].text
                     user = CustomUser.objects.get(username=request.user.username)
                     blogPost = BlogPost.objects.create(

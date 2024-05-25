@@ -15,4 +15,5 @@ urlpatterns = [
     path('blogs', user_blogs, name='user_blogs'),
     path('profile', profile, name='profile'),
     path('like/<int:post_id>/', like_blog_post, name='like_blog_post'),
+    path('profile/update/', profile_update, name='profile_update'),
 ]
