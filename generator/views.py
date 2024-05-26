@@ -203,22 +203,26 @@ def yt_view(request):
             title = YouTube(yt_link).title
             print(title)
             if video_id:
-                extraction = YouTubeTranscriptApi.get_transcript(video_id)
-                final_text = ""
-                for item in extraction:
-                    final_text += item['text']
                 try:
-                    genai.configure(api_key=os.environ.get("GEMINI_API_KEY"))
-                    model = genai.GenerativeModel('gemini-pro')
-                    response = model.generate_content(f"Based on the following transcript from a YouTube video,write a comprehensive blog article, write it based on the transcript, but dont make it look like a youtube video, make it look like a proper blog article:{final_text}")
-                    response_data = response.candidates[0].content.parts[0].text
-                    user = CustomUser.objects.get(username=request.user.username)
-                    blogPost = BlogPost.objects.create(
-                        title=title,
-                        content=response_data,
-                        author=user
-                    )
-                    return HttpResponse(json.dumps({'content': response_data, 'blogpost_id': blogPost.id}), content_type="application/json")
+                    extraction = YouTubeTranscriptApi.get_transcript(video_id, languages=['en','en-IN','hi'])
+                    final_text = ""
+                    for item in extraction:
+                        final_text += item['text']
+                    try:
+                        genai.configure(api_key=os.environ.get("GEMINI_API_KEY"))
+                        model = genai.GenerativeModel('gemini-pro')
+                        response = model.generate_content(f"Based on the following transcript from a YouTube video,write a comprehensive blog article, write it based on the transcript, but dont make it look like a youtube video, make it look like a proper blog article:{final_text}")
+                        response_data = response.candidates[0].content.parts[0].text
+                        user = CustomUser.objects.get(username=request.user.username)
+                        blogPost = BlogPost.objects.create(
+                            title=title,
+                            content=response_data,
+                            author=user
+                        )
+                        return HttpResponse(json.dumps({'content': response_data, 'blogpost_id': blogPost.id}), content_type="application/json")
+                    except Exception as e:
+                        print(e)
+                        return HttpResponse(json.dumps({'error': str(e)}), status=500, content_type="application/json")
                 except Exception as e:
                     print(e)
                     return HttpResponse(json.dumps({'error': str(e)}), status=500, content_type="application/json")
@@ -226,3 +230,12 @@ def yt_view(request):
                 return HttpResponse(json.dumps({'error': "Error in YouTube link"}), status=400, content_type="application/json")
     else:
         return HttpResponse(json.dumps({'error': 'Method not allowed'}), status=400, content_type="application/json")
+    
+def delete_blog(request,id):
+    try:
+        blog = get_object_or_404(BlogPost, id=id)
+        blog.delete()
+        return redirect('/blogs')
+    except Exception as e:
+        return HttpResponse(json.dumps({'error':"Invalid id"}), content_type="application/json")
+        

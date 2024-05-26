@@ -26,14 +26,13 @@
                   {% endif %}
                 </div>
                 <div class="px-6 py-4">
-                  <a href="{% url 'blog_detail' blog.slug %}" class="text-2xl font-semibold mb-2 hover:text-blue-500">{{ blog.title }}</a>
+                  <a href="{% url 'blog_detail' blog.slug %}" class="text-lg font-semibold mb-2 hover:text-blue-500">{{ blog.title }}</a>
                   <p class="text-gray-400 text-sm">Published on {{ blog.created_at }}</p>
                 </div>
             </div>
         {% endfor %}
       </div>
     </div>
-
 
     <footer class="text-center p-4 text-blacl mt-2">
         Created by <span class="text-lg pb-5 font-extrabold text-transparent bg-clip-text bg-gradient-to-br from-pink-500 via-blue-500 to-red-600">Tech Paradise</span>

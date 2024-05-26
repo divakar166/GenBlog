@@ -236,6 +236,7 @@
                         body: JSON.stringify({ yt_link: yt_link })
                     });
                     const data = await response.json();
+                    console.log(data)
                     blogContent.html('');
                     markdownText = data.content;
                     const converter = new showdown.Converter();
