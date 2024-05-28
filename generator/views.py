@@ -10,8 +10,8 @@ import json
 from youtube_transcript_api import YouTubeTranscriptApi
 import re
 from pytube import YouTube
-from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
+from django.contrib import messages
 
 def index(request):
     if request.user.is_authenticated:
@@ -141,36 +141,24 @@ def user_blogs(request):
 def profile(request):
     if request.method == 'POST':
         user = request.user
-        user.name = request.POST.get('name')
+        name = request.POST.get('name')
+        profile_img = request.FILES.get('profile_img')
 
-        if 'profile_img' in request.FILES:
-            user.profile_img.save(request.FILES['profile_img'].name, ContentFile(request.FILES['profile_img'].read()))
-        
+        user.name = name
+
+        if profile_img:
+            if user.profile_img:
+                old_image_path = user.profile_img.path
+                if os.path.exists(old_image_path):
+                    os.remove(old_image_path)
+            user.profile_img = profile_img
+
         user.save()
-        return redirect('profile')
+        return render(request, 'profile.html', {'user': request.user})
+
+
 
     return render(request, 'profile.html', {'user': request.user})
-
-@login_required
-@csrf_exempt
-def profile_update(request):
-    if request.method == 'POST':
-        user = request.user
-        user.name = request.POST.get('name')
-        
-        if 'profile_img' in request.FILES:
-            user.profile_img.save(request.FILES['profile_img'].name, request.FILES['profile_img'])
-        
-        user.save()
-
-        response_data = {
-            'name': user.name,
-            'profile_img_url': user.profile_img.url if user.profile_img else None
-        }
-        
-        return JsonResponse(response_data)
-
-    return JsonResponse({'error': 'Invalid request'}, status=400)
     
 def like_blog_post(request, post_id):
     if request.method == "POST":
@@ -238,4 +226,3 @@ def delete_blog(request,id):
         return redirect('/blogs')
     except Exception as e:
         return HttpResponse(json.dumps({'error':"Invalid id"}), content_type="application/json")
-        

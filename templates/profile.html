@@ -13,25 +13,56 @@
     <!-- Navbar -->
     {% include 'navbar.html' %}
     <div class="flex-grow container mt-5 mx-auto px-4">
-        <form class="flex gap-4" id="profile-form" method="post" enctype="multipart/form-data">
-            <div>
-                {% if user.profile_img %}
-                    <img src="{{ user.profile_img.url }}" class="h-80" alt="Profile Image" class="img-thumbnail" id="profile-img-preview">
+        <form action="{% url 'profile' %}" class="flex gap-4" id="profile-form" method="post" enctype="multipart/form-data">
+          <div>
+            {% csrf_token %}
+            {% if user.profile_img %}
+              <img src="{{ user.profile_img.url }}" class="h-[250px] w-[250px] img-thumbnail" alt="Profile Image" id="profile-img-preview">
+              <div id="profile-img-upload" class="hidden">
+                <label for="file" class="file-upload-label">
+                  <div class="file-upload-design">
+                    <svg viewBox="0 0 640 512" height="1em">
+                      <path
+                        d="M144 480C64.5 480 0 415.5 0 336c0-62.8 40.2-116.2 96.2-135.9c-.1-2.7-.2-5.4-.2-8.1c0-88.4 71.6-160 160-160c59.3 0 111 32.2 138.7 80.2C409.9 102 428.3 96 448 96c53 0 96 43 96 96c0 12.2-2.3 23.8-6.4 34.6C596 238.4 640 290.1 640 352c0 70.7-57.3 128-128 128H144zm79-217c-9.4 9.4-9.4 24.6 0 33.9s24.6 9.4 33.9 0l39-39V392c0 13.3 10.7 24 24 24s24-10.7 24-24V257.9l39 39c9.4 9.4 24.6 9.4 33.9 0s9.4-24.6 0-33.9l-80-80c-9.4-9.4-24.6-9.4-33.9 0l-80 80z"
+                      ></path>
+                    </svg>
+                    <p>Drag and Drop</p>
+                    <p>or</p>
+                    <span class="browse-button">Browse file</span>
+                  </div>
+                  <input id="file" type="file" accept="image/*" name="profile_img" />
+                </label>
+              </div>
                 {% else %}
-                    <p>No profile image uploaded.</p>
+                <img src="" class="h-[250px] w-[250px] img-thumbnail" alt="Image not found" id="profile-img-preview">
+                <div id="profile-img-upload" class="hidden">
+                  <label for="file" class="file-upload-label">
+                    <div class="file-upload-design">
+                      <svg viewBox="0 0 640 512" height="1em">
+                        <path
+                          d="M144 480C64.5 480 0 415.5 0 336c0-62.8 40.2-116.2 96.2-135.9c-.1-2.7-.2-5.4-.2-8.1c0-88.4 71.6-160 160-160c59.3 0 111 32.2 138.7 80.2C409.9 102 428.3 96 448 96c53 0 96 43 96 96c0 12.2-2.3 23.8-6.4 34.6C596 238.4 640 290.1 640 352c0 70.7-57.3 128-128 128H144zm79-217c-9.4 9.4-9.4 24.6 0 33.9s24.6 9.4 33.9 0l39-39V392c0 13.3 10.7 24 24 24s24-10.7 24-24V257.9l39 39c9.4 9.4 24.6 9.4 33.9 0s9.4-24.6 0-33.9l-80-80c-9.4-9.4-24.6-9.4-33.9 0l-80 80z"
+                        ></path>
+                      </svg>
+                      <p>Drag and Drop</p>
+                      <p>or</p>
+                      <span class="browse-button">Browse file</span>
+                    </div>
+                    <input id="file" type="file" accept="image/*" name="profile_img" />
+                  </label>
+                </div>
                 {% endif %}
             </div>
             <div>
                 <div class="mb-2">
                     <label for="name" class="block text-sm font-medium leading-6 text-gray-900">Full Name</label>
                     <div class="relative mt-1 rounded-md shadow-sm">
-                      <input type="text" value={{user.name}} disabled name="name" id="name" class="block w-full rounded-md border-0 py-1.5 pl-2 pr-20 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" placeholder="0.00">
+                      <input type="text" value="{{user.name}}" disabled name="name" id="name" class="block w-full rounded-md border-0 py-1.5 pl-2 pr-20 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" placeholder="0.00">
                     </div>
                   </div>
                   <div class="mb-2">
                     <label for="name" class="block text-sm font-medium leading-6 text-gray-900">Email</label>
                     <div class="relative mt-1 rounded-md shadow-sm">
-                      <input type="text" value={{user.email}} disabled name="email" id="email" class="block w-full rounded-md border-0 py-1.5 pl-2 pr-2 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:border-blue-500 focus:ring-indigo-600 sm:text-sm sm:leading-6" placeholder="abc@gmail.com">
+                      <input type="text" value="{{user.email}}" disabled name="email" id="email" class="block w-full rounded-md border-0 py-1.5 pl-2 pr-2 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:border-blue-500 focus:ring-indigo-600 sm:text-sm sm:leading-6" placeholder="abc@gmail.com">
                     </div>
                   </div>
                   <div>
@@ -64,6 +95,13 @@
                   <button type="button" class="hidden cancel_btn rounded-lg bg-gray-400 px-4 text-white py-1">Cancel</button>
             </div>
         </form>
+        {% if messages %}
+            <ul class="messages">
+                {% for message in messages %}
+                    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
     </div>
     <footer class="text-center p-4 text-blacl mt-2">
         Created by <span class="text-lg pb-5 font-extrabold text-transparent bg-clip-text bg-gradient-to-br from-pink-500 via-blue-500 to-red-600">Tech Paradise</span>
@@ -71,40 +109,43 @@
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script>
         $(document).ready(function(){
-            $('.edit_btn').on('click',function(){
-                $("#email").attr('disabled',false)
-                $("#email").attr('readonly',false)
-                $("#name").attr('disabled',false)
-                $("#name").attr('readonly',false)
-                $('.cancel_btn,.submit_btn').removeClass('hidden');
-                $('.edit_btn').addClass('hidden');
-            });
-            $('.cancel_btn').on('click',function(){
-                $("#email").attr('disabled',true)
-                $("#email").attr('readonly',true)
-                $("#name").attr('disabled',true)
-                $("#name").attr('readonly',true)
-                $('.cancel_btn,.submit_btn').addClass('hidden');
-                $('.edit_btn').removeClass('hidden');
-            })
-            $('#profile-form').on('submit', function(e){
-                e.preventDefault();
-                var formData = new FormData(this);
-                console.log(formData)
-                // $.ajax({
-                //     type: 'POST',
-                //     url: '{% url "profile_update" %}',
-                //     data: formData,
-                //     processData: false,
-                //     contentType: false,
-                //     success: function(response){
-                //         window.location.href = '/profile'
-                //     },
-                //     error: function(response){
-                //         alert('An error occurred while updating the profile.');
-                //     }
-                // });
-            });
+          const originalImageUrl = $('#profile-img-preview').attr('src');
+          const $fileInput = $('#file');
+          const $profileImgPreview = $('#profile-img-preview');
+          const $profileImgUploadDiv = $('#profile-img-upload');
+          const $editBtn = $('.edit_btn');
+          const $submitBtn = $('.submit_btn');
+          const $cancelBtn = $('.cancel_btn');
+          const $nameInput = $('#name');
+          const $emailInput = $('#email');
+          const $likesInput = $('#likes');
+          $('.edit_btn').on('click',function(){
+            $("#name").attr({ disabled: false, readonly: false });
+            $('#profile-img-upload').removeClass('hidden').addClass('flex');
+            $('.img-thumbnail').addClass('hidden');
+            $('.cancel_btn, .submit_btn').removeClass('hidden');
+            $('.edit_btn').addClass('hidden');
+          });
+          $('.cancel_btn').on('click',function(){
+            $("#email, #name").attr({ disabled: true, readonly: true });
+            $('.img-thumbnail').removeClass('hidden');
+            $('#profile-img-upload').addClass('hidden');
+            $('.cancel_btn, .submit_btn').addClass('hidden');
+            $('.edit_btn').removeClass('hidden');
+            $('#profile-img-preview').attr('src', originalImageUrl).removeClass('hidden');
+            $('#profile-img-upload').addClass('hidden');
+            $('#file').val('');
+          });
+          $fileInput.on('change', function() {
+            if ($fileInput[0].files && $fileInput[0].files[0]) {
+              const reader = new FileReader();
+              reader.onload = function(e) {
+                $profileImgPreview.attr('src', e.target.result).removeClass('hidden');
+                $profileImgUploadDiv.addClass('hidden');
+              };
+              reader.readAsDataURL($fileInput[0].files[0]);
+            }
+          });
         });
     </script>
 </body>

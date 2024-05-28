@@ -4,7 +4,7 @@ from django.utils.text import slugify
 
 class CustomUser(AbstractUser):
     email = models.EmailField(unique=True)
-    name = models.CharField(max_length=150)
+    name = models.CharField(max_length=150, null=True, blank=True)
     profile_img = models.ImageField(upload_to='profiles/', blank=True, null=True)
 
     def __str__(self):
