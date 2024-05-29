@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth import authenticate, login, logout, get_user_model
-from .models import CustomUser, BlogPost, Like
+from .models import CustomUser, BlogPost, Like, ContactMessage
 import os
 import google.generativeai as genai
 from django.http import HttpResponse, JsonResponse
@@ -12,6 +12,8 @@ import re
 from pytube import YouTube
 from django.core.files.base import ContentFile
 from django.contrib import messages
+from django.core.mail import send_mail
+from django.conf import settings
 
 def index(request):
     if request.user.is_authenticated:
@@ -153,13 +155,12 @@ def profile(request):
                     os.remove(old_image_path)
             user.profile_img = profile_img
 
+        
         user.save()
         return render(request, 'profile.html', {'user': request.user})
 
-
-
     return render(request, 'profile.html', {'user': request.user})
-    
+      
 def like_blog_post(request, post_id):
     if request.method == "POST":
         post = get_object_or_404(BlogPost, id=post_id)
@@ -226,3 +227,41 @@ def delete_blog(request,id):
         return redirect('/blogs')
     except Exception as e:
         return HttpResponse(json.dumps({'error':"Invalid id"}), content_type="application/json")
+
+def update_blog(request,id):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            title = data.get('title')
+            content = data.get('content')
+
+            blog = get_object_or_404(BlogPost, id=id)
+            blog.title = title
+            blog.content = content
+            blog.save()
+            return JsonResponse({'status': 'success', 'message': 'Blog updated successfully'})
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
+    else:
+        return JsonResponse({'status': 'error', 'message': 'Invalid request method'}, status=405)
+
+def about(request):
+    return render(request, 'about_us.html')
+
+def contact(request):
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        email = request.POST.get('email')
+        message = request.POST.get('message')
+        print(name,email,message)
+        if name and email and message:
+            try:
+                contact_message = ContactMessage.objects.create(name=name,email=email,message=message)
+                messages.success(request, 'Your message has been sent successfully!')
+                return redirect('contact')
+                # return JsonResponse({'status': 'success', 'message': 'Message sent and saved successfully'})
+            except Exception as e:
+                return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+        else:
+            return JsonResponse({'status': 'error', 'message': 'All fields are required'}, status=400)
+    return render(request, 'contact_us.html')

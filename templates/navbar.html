@@ -11,10 +11,10 @@
       <a href="{% url 'generate' %}" class="cta mr-4 {% if request.path == '/generate' %}active{% endif %}">
         <span class="hover-underline-animation"> Generate </span>
       </a>
-      <a href="#" class="cta mr-4 {% if request.path == '/about' %}active{% endif %}">
+      <a href="{% url 'about' %}" class="cta mr-4 {% if request.path == '/about' %}active{% endif %}">
         <span class="hover-underline-animation"> About </span>
       </a>
-      <a href="#" class="cta {% if request.path == '/contact' %}active{% endif %}">
+      <a href="{% url 'contact' %}" class="cta {% if request.path == '/contact' %}active{% endif %}">
         <span class="hover-underline-animation"> Contact Us </span>
       </a>
     </div>
