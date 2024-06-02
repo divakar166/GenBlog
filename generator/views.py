@@ -145,22 +145,21 @@ def profile(request):
         user = request.user
         name = request.POST.get('name')
         profile_img = request.FILES.get('profile_img')
-
         user.name = name
-
         if profile_img:
             if user.profile_img:
                 old_image_path = user.profile_img.path
                 if os.path.exists(old_image_path):
                     os.remove(old_image_path)
             user.profile_img = profile_img
-
-        
         user.save()
         return render(request, 'profile.html', {'user': request.user})
-
     return render(request, 'profile.html', {'user': request.user})
-      
+
+def profileByID(request,id):
+    profile = CustomUser.objects.get(id=id)
+    return render(request,'profile.html',{'profile': profile})
+
 def like_blog_post(request, post_id):
     if request.method == "POST":
         post = get_object_or_404(BlogPost, id=post_id)

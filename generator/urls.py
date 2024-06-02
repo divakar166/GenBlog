@@ -14,6 +14,7 @@ urlpatterns = [
     path('blog/<slug:slug>', blog_detail, name='blog_detail'),
     path('blogs', user_blogs, name='user_blogs'),
     path('profile', profile, name='profile'),
+    path('profile/<int:id>/', profileByID, name='profileByID'),
     path('like/<int:post_id>/', like_blog_post, name='like_blog_post'),
     path('blog/delete/<int:id>/', delete_blog, name='delete_blog'),
     path('blog/update/<int:id>/', update_blog, name='update_blog'),

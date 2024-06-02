@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GenBlog | AI Blog Generator</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="/media/js/tailwind.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link rel="stylesheet" href="/media/css/styles.css">
 </head>
@@ -68,8 +68,8 @@
                 {% endif %}
               </div>
               <div class="px-6 py-4">
-                <a href="{% url 'blog_detail' blog.slug %}" class="text-2xl font-semibold mb-2 hover:text-blue-500">{{ blog.title }}</a>
-                <p class="text-gray-500 italic">By {{ blog.author.name }}</p>
+                <a href="{% url 'blog_detail' blog.slug %}" class="text-2xl font-semibold mb-2 hover:text-blue-500">{{ blog.title }}</a> <br>
+                <a href="{% url 'profileByID' blog.author.id %}" class="text-gray-500 italic">By {{ blog.author.name }}</a>
                 <p class="text-gray-400 text-sm">Published on {{ blog.created_at }}</p>
               </div>
             </div>
@@ -86,8 +86,7 @@
     {% endif %}
 
     <footer class="text-center p-4 text-blacl mt-2">
-        Created by <span class="text-lg pb-5 font-extrabold text-transparent bg-clip-text bg-gradient-to-br from-pink-500 via-blue-500 to-red-600">Tech Paradise</span>
+      Created by <span class="text-lg pb-5 font-extrabold text-transparent bg-clip-text bg-gradient-to-br from-pink-500 via-blue-500 to-red-600">Tech Paradise</span>
     </footer>
-
 </body>
 </html>

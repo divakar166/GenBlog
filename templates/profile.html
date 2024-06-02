@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GenBlog | AI Blog Generator</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="/media/js/tailwind.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link rel="stylesheet" href="/media/css/styles.css">
     
@@ -12,6 +12,14 @@
 <body class="flex flex-col min-h-scrren bg-gray-100 font-sans antialised">
     <!-- Navbar -->
     {% include 'navbar.html' %}
+    {% if profile %}
+      <div class="flex-grow container mt-5 mx-auto px-4">
+        <div class="h-full w-full flex justify-center items-center flex-col">
+          <img class="w-[150px] h-[150px] rounded-full border-[1px] border-slate-400" src="{{ profile.profile_img.url }}" alt="">
+          <div class="text-lg font-bold">{{profile.name}}</div>
+        </div>
+      </div>
+    {% else %}
     <div class="flex-grow container mt-5 mx-auto px-4">
         <form action="{% url 'profile' %}" class="flex gap-4" id="profile-form" method="post" enctype="multipart/form-data">
           <div>
@@ -103,6 +111,7 @@
             </ul>
         {% endif %}
     </div>
+    {% endif %}
     <footer class="text-center p-4 text-blacl mt-2">
         Created by <span class="text-lg pb-5 font-extrabold text-transparent bg-clip-text bg-gradient-to-br from-pink-500 via-blue-500 to-red-600">Tech Paradise</span>
     </footer>
